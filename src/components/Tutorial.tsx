@@ -18,7 +18,7 @@ const Tutorial: React.FC = () => {
     },
     {
       title: "Step-by-step Protocol",
-      content: "1. Both parties agree on a prime number p and a generator g\n\n2. Each party generates a private key\n\n3. Each party calculates their public key\n\n4. Parties exchange public keys\n\n5. Each party calculates the shared secret"
+      content: "1. Both parties agree on a prime number p and a generator g\n2. Each party generates a private key\n3. Each party calculates their public key\n4. Parties exchange public keys\n5. Each party calculates the shared secret"
     },
     {
       title: "Interactive Demonstration",
@@ -30,29 +30,29 @@ const Tutorial: React.FC = () => {
     },
     {
       title: "X3DH Key Components",
-      content: "The protocol uses several types of keys:\n\n1. Identity Key (IK): A long-term public key\n\n2. Signed Pre-Key (SPK): A medium-term key signed by the identity key\n\n3. One-Time Pre-Keys (OPK): Short-term keys used once\n\n4. Ephemeral Key (EK): A temporary key generated for each session"
+      content: "The protocol uses several types of keys:\n\n1. Identity Key (IK): A long-term public key\n2. Signed Pre-Key (SPK): A medium-term key signed by the identity key\n3. One-Time Pre-Keys (OPK): Short-term keys used once\n4. Ephemeral Key (EK): A temporary key generated for each session"
     },
     {
       title: "X3DH Protocol Steps",
-      content: "1. Supplier fetches Mill's public keys (IK, SPK, OPK)\n\n2. Supplier generates an ephemeral key pair\n\n3. Supplier performs three DH calculations:\n   - DH(IK_A, SPK_B)\n   - DH(EK_A, IK_B)\n   - DH(EK_A, SPK_B)\n\n4. If Mill has published OPKs, Supplier also calculates:\n   - DH(EK_A, OPK_B)\n\n5. The results are combined to create the shared secret"
+      content: "1. Supplier fetches Mill's public keys (IK, SPK, OPK)\n2. Supplier generates an ephemeral key pair\n3. Supplier performs three DH calculations:\n   - DH(IK_A, SPK_B)\n   - DH(EK_A, IK_B)\n   - DH(EK_A, SPK_B)\n4. If Mill has published OPKs, Supplier also calculates:\n   - DH(EK_A, OPK_B)\n5. The results are combined to create the shared secret"
     },
     {
       title: "Security Properties",
-      content: "X3DH provides:\n\n1. Forward Secrecy: Past messages remain secure even if long-term keys are compromised\n\n2. Cryptographic Deniability: Messages can't be cryptographically proven to come from a specific sender\n\n3. Protection against Key Compromise: Compromise of one key doesn't affect the security of other sessions"
+      content: "X3DH provides:\n\n1. Forward Secrecy: Past messages remain secure even if long-term keys are compromised\n2. Cryptographic Deniability: Messages can't be cryptographically proven to come from a specific sender\n3. Protection against Key Compromise: Compromise of one key doesn't affect the security of other sessions"
     }
   ];
 
   return (
     <div className="tutorial">
       <h1 className="mb-4">Diffie-Hellman Tutorial</h1>
-      
+
       <div className="progress mb-4">
-        <div 
-          className="progress-bar" 
-          role="progressbar" 
+        <div
+          className="progress-bar"
+          role="progressbar"
           style={{ width: `${(currentStep / steps.length) * 100}%` }}
-          aria-valuenow={currentStep} 
-          aria-valuemin={1} 
+          aria-valuenow={currentStep}
+          aria-valuemin={1}
           aria-valuemax={steps.length}
         />
       </div>
@@ -60,19 +60,22 @@ const Tutorial: React.FC = () => {
       <div className="card">
         <div className="card-body">
           <h2 className="card-title">{steps[currentStep - 1].title}</h2>
-          <p className="card-text">{steps[currentStep - 1].content}</p>
+          <div
+            className="card-text"
+            dangerouslySetInnerHTML={{ __html: steps[currentStep - 1].content.replace(/\n/g, '<br/>') }}
+          />
         </div>
       </div>
 
       <div className="mt-4">
-        <button 
+        <button
           className="btn btn-primary me-2"
           onClick={() => setCurrentStep(prev => Math.max(1, prev - 1))}
           disabled={currentStep === 1}
         >
           Previous
         </button>
-        <button 
+        <button
           className="btn btn-primary"
           onClick={() => setCurrentStep(prev => Math.min(steps.length, prev + 1))}
           disabled={currentStep === steps.length}

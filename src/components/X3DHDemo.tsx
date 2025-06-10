@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import SharedSecret from './SharedSecret';
 
 interface KeyPair {
     privateKey: bigint;
@@ -229,7 +228,7 @@ const X3DHDemo: React.FC = () => {
         e.preventDefault();
         const newPrivateKey = generateMediumPrime();
         const newPublicKey = calculatePublicKey(newPrivateKey, BigInt(g), BigInt(p));
-        
+
         if (isSupplier) {
             setSupplier(prev => ({
                 ...prev,
@@ -253,7 +252,7 @@ const X3DHDemo: React.FC = () => {
         e.preventDefault();
         const newPrivateKey = generateMediumPrime();
         const newPublicKey = calculatePublicKey(newPrivateKey, BigInt(g), BigInt(p));
-        
+
         setSupplier(prev => ({
             ...prev,
             ephemeralKey: {
@@ -267,7 +266,7 @@ const X3DHDemo: React.FC = () => {
         e.preventDefault();
         const newPrivateKey = generateMediumPrime();
         const newPublicKey = calculatePublicKey(newPrivateKey, BigInt(g), BigInt(p));
-        
+
         setMill(prev => ({
             ...prev,
             oneTimePreKeys: [{
@@ -378,6 +377,13 @@ const X3DHDemo: React.FC = () => {
                                         readOnly
                                     />
                                 </div>
+                                <div>
+                                    <p>
+                                        Supplier's Identity Key:
+                                        <br />- Private key: {supplier.identityKey.privateKey.toString()}
+                                        <br />- Public key: {g}^{supplier.identityKey.privateKey.toString()} mod {p} = {supplier.identityKey.publicKey.toString()}
+                                    </p>
+                                </div>
                             </div>
 
                             <div className="mb-3">
@@ -396,6 +402,7 @@ const X3DHDemo: React.FC = () => {
                                     />
                                 </div>
                                 <div className="input-group">
+
                                     <span className="input-group-text bg-secondary text-white">Public</span>
                                     <input
                                         type="text"
@@ -404,6 +411,13 @@ const X3DHDemo: React.FC = () => {
                                         readOnly
                                         disabled
                                     />
+                                </div>
+                                <div>
+                                    <p>
+                                        Supplier's Signed Pre-Key:
+                                        <br />- Private key: {supplier.signedPreKey.privateKey.toString()}
+                                        <br />- Public key: {g}^{supplier.signedPreKey.privateKey.toString()} mod {p} = {supplier.signedPreKey.publicKey.toString()}
+                                    </p>
                                 </div>
                             </div>
 
@@ -422,6 +436,7 @@ const X3DHDemo: React.FC = () => {
                                     />
                                 </div>
                                 <div className="input-group">
+
                                     <span className="input-group-text bg-primary text-white">Public</span>
                                     <input
                                         type="text"
@@ -429,6 +444,13 @@ const X3DHDemo: React.FC = () => {
                                         value={supplier.ephemeralKey.publicKey.toString()}
                                         readOnly
                                     />
+                                </div>
+                                <div>
+                                    <p>
+                                        Supplier's Ephemeral Key:
+                                        <br />- Private key: {supplier.ephemeralKey.privateKey.toString()}
+                                        <br />- Public key: {g}^{supplier.ephemeralKey.privateKey.toString()} mod {p} = {supplier.ephemeralKey.publicKey.toString()}
+                                    </p>
                                 </div>
                             </div>
 
@@ -473,14 +495,42 @@ const X3DHDemo: React.FC = () => {
                                 <small className="text-muted">g must be a primitive root modulo p</small>
                             </div>
 
+                            <div className="mb-3">
+                                <h4>Public Key Calculation</h4>
+                                <p className="text-muted">
+                                    Public key = g^private_key mod p
+                                </p>
+                            </div>
+
+                            <div className="mt-3">
+                                <h4>Actual X3DH Calculation</h4>
+                                <p className="text-muted">
+                                    1. DH(IK_A, SPK_B) = {g}^{supplier.identityKey.privateKey.toString()} * {mill.signedPreKey.publicKey.toString()} mod {p} = {calculateSharedSecret(supplier.identityKey.privateKey, mill.signedPreKey.publicKey, BigInt(p)).toString()}
+                                    <br />2. DH(EK_A, IK_B) = {g}^{supplier.ephemeralKey.privateKey.toString()} * {mill.identityKey.publicKey.toString()} mod {p} = {calculateSharedSecret(supplier.ephemeralKey.privateKey, mill.identityKey.publicKey, BigInt(p)).toString()}
+                                    <br />3. DH(EK_A, SPK_B) = {g}^{supplier.ephemeralKey.privateKey.toString()} * {mill.signedPreKey.publicKey.toString()} mod {p} = {calculateSharedSecret(supplier.ephemeralKey.privateKey, mill.signedPreKey.publicKey, BigInt(p)).toString()}
+                                    <br />4. DH(EK_A, OPK_B) = {g}^{supplier.ephemeralKey.privateKey.toString()} * {mill.oneTimePreKeys[0].publicKey.toString()} mod {p} = {calculateSharedSecret(supplier.ephemeralKey.privateKey, mill.oneTimePreKeys[0].publicKey, BigInt(p)).toString()}
+                                    <br /><br />
+                                    Final shared secret = ({calculateSharedSecret(supplier.identityKey.privateKey, mill.signedPreKey.publicKey, BigInt(p)).toString()} * {calculateSharedSecret(supplier.ephemeralKey.privateKey, mill.identityKey.publicKey, BigInt(p)).toString()} * {calculateSharedSecret(supplier.ephemeralKey.privateKey, mill.signedPreKey.publicKey, BigInt(p)).toString()} * {calculateSharedSecret(supplier.ephemeralKey.privateKey, mill.oneTimePreKeys[0].publicKey, BigInt(p)).toString()}) mod {p} = {sharedSecret?.toString() || 'Not calculated yet'}
+                                </p>
+                            </div>
+
                             <div>
                                 <h3>X3DH Shared Secret</h3>
                                 <p className="text-muted">
                                     The shared secret is calculated using four DH operations:
-                                    <br />1. DH(IK_A, SPK_B)
-                                    <br />2. DH(EK_A, IK_B)
-                                    <br />3. DH(EK_A, SPK_B)
-                                    <br />4. DH(EK_A, OPK_B)
+                                    <br />1. DH(IK_A, SPK_B) = g^(ik_a * spk_b) mod p
+                                    <br />2. DH(EK_A, IK_B) = g^(ek_a * ik_b) mod p
+                                    <br />3. DH(EK_A, SPK_B) = g^(ek_a * spk_b) mod p
+                                    <br />4. DH(EK_A, OPK_B) = g^(ek_a * opk_b) mod p
+                                    <br /><br />
+                                    Final shared secret = (DH1 * DH2 * DH3 * DH4) mod p
+                                    <br /><br />
+                                    Where:
+                                    <br />- ik_a: Supplier's identity key private key
+                                    <br />- spk_b: Mill's signed pre-key public key
+                                    <br />- ek_a: Supplier's ephemeral key private key
+                                    <br />- ik_b: Mill's identity key public key
+                                    <br />- opk_b: Mill's one-time pre-key public key
                                 </p>
 
                             </div>
