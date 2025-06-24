@@ -1,3 +1,4 @@
+import { MathJax, MathJaxContext } from 'better-react-mathjax';
 import React, { useState } from 'react';
 
 interface KeyPair {
@@ -260,6 +261,7 @@ const X3DHDemo: React.FC = () => {
                 publicKey: newPublicKey
             }
         }));
+        handleCalculate();
     };
 
     const handleGenerateOneTimePreKey = (e: React.MouseEvent) => {
@@ -274,6 +276,7 @@ const X3DHDemo: React.FC = () => {
                 publicKey: newPublicKey
             }]
         }));
+        handleCalculate();
     };
 
     const handleCalculate = () => {
@@ -315,26 +318,26 @@ const X3DHDemo: React.FC = () => {
             setSharedSecret(finalSharedSecret);
 
             // Auto rotate ephemeral key
-            const newEphemeralPrivateKey = generateMediumPrime();
-            const newEphemeralPublicKey = calculatePublicKey(newEphemeralPrivateKey, gBig, pBig);
-            setSupplier(prev => ({
-                ...prev,
-                ephemeralKey: {
-                    privateKey: newEphemeralPrivateKey,
-                    publicKey: newEphemeralPublicKey
-                }
-            }));
+            // const newEphemeralPrivateKey = generateMediumPrime();
+            // const newEphemeralPublicKey = calculatePublicKey(newEphemeralPrivateKey, gBig, pBig);
+            // setSupplier(prev => ({
+            //     ...prev,
+            //     ephemeralKey: {
+            //         privateKey: newEphemeralPrivateKey,
+            //         publicKey: newEphemeralPublicKey
+            //     }
+            // }));
 
-            // Auto rotate one-time pre-key
-            const newOneTimePrivateKey = generateMediumPrime();
-            const newOneTimePublicKey = calculatePublicKey(newOneTimePrivateKey, gBig, pBig);
-            setMill(prev => ({
-                ...prev,
-                oneTimePreKeys: [{
-                    privateKey: newOneTimePrivateKey,
-                    publicKey: newOneTimePublicKey
-                }]
-            }));
+            // // Auto rotate one-time pre-key
+            // const newOneTimePrivateKey = generateMediumPrime();
+            // const newOneTimePublicKey = calculatePublicKey(newOneTimePrivateKey, gBig, pBig);
+            // setMill(prev => ({
+            //     ...prev,
+            //     oneTimePreKeys: [{
+            //         privateKey: newOneTimePrivateKey,
+            //         publicKey: newOneTimePublicKey
+            //     }]
+            // }));
 
         } catch (error) {
             alert('Error in calculation. Please check your inputs.');
@@ -378,10 +381,10 @@ const X3DHDemo: React.FC = () => {
                                     />
                                 </div>
                                 <div>
-                                    <p>
-                                        Supplier's Identity Key:
-                                        <br />- Private key: {supplier.identityKey.privateKey.toString()}
-                                        <br />- Public key: {g}^{supplier.identityKey.privateKey.toString()} mod {p} = {supplier.identityKey.publicKey.toString()}
+                                    <p className="text-muted small">
+                                        <MathJaxContext>
+                                            <MathJax>{"\\(" + g.toString() + "^{" + supplier.identityKey.privateKey.toString() + "} \\mod " + p + " = " + supplier.identityKey.publicKey.toString() + "\\)"}</MathJax>
+                                        </MathJaxContext>
                                     </p>
                                 </div>
                             </div>
@@ -402,8 +405,7 @@ const X3DHDemo: React.FC = () => {
                                     />
                                 </div>
                                 <div className="input-group">
-
-                                    <span className="input-group-text bg-secondary text-white">Public</span>
+                                    <span className="input-group-text bg-primary text-white">Public</span>
                                     <input
                                         type="text"
                                         className="form-control"
@@ -413,16 +415,16 @@ const X3DHDemo: React.FC = () => {
                                     />
                                 </div>
                                 <div>
-                                    <p>
-                                        Supplier's Signed Pre-Key:
-                                        <br />- Private key: {supplier.signedPreKey.privateKey.toString()}
-                                        <br />- Public key: {g}^{supplier.signedPreKey.privateKey.toString()} mod {p} = {supplier.signedPreKey.publicKey.toString()}
+                                    <p className="text-muted small">
+                                        <MathJaxContext>
+                                            <MathJax>{"\\(" + g.toString() + "^{" + supplier.signedPreKey.privateKey.toString() + "} \\mod " + p + " = " + supplier.signedPreKey.publicKey.toString() + "\\)"}</MathJax>
+                                        </MathJaxContext>
                                     </p>
                                 </div>
                             </div>
 
                             <div className="mb-3">
-                                <label className="form-label">Ephemeral Key (<span className="badge rounded-pill text-bg-danger">EK_A</span>):</label>
+                                <label className="form-label"><a href="#" onClick={(e) => handleGenerateEphemeralKey(e)}>Ephemeral Key</a> (<span className="badge rounded-pill text-bg-danger">EK_A</span>):</label>
                                 <div className="input-group mb-2">
                                     <span className="input-group-text">Private</span>
                                     <input
@@ -436,7 +438,6 @@ const X3DHDemo: React.FC = () => {
                                     />
                                 </div>
                                 <div className="input-group">
-
                                     <span className="input-group-text bg-primary text-white">Public</span>
                                     <input
                                         type="text"
@@ -446,16 +447,117 @@ const X3DHDemo: React.FC = () => {
                                     />
                                 </div>
                                 <div>
-                                    <p>
-                                        Supplier's Ephemeral Key:
-                                        <br />- Private key: {supplier.ephemeralKey.privateKey.toString()}
-                                        <br />- Public key: {g}^{supplier.ephemeralKey.privateKey.toString()} mod {p} = {supplier.ephemeralKey.publicKey.toString()}
+                                    <p className="text-muted small">
+                                        <MathJaxContext>
+                                            <MathJax>{"\\(" + g.toString() + "^{" + supplier.ephemeralKey.privateKey.toString() + "} \\mod " + p + " = " + supplier.ephemeralKey.publicKey.toString() + "\\)"}</MathJax>
+                                        </MathJaxContext>
                                     </p>
                                 </div>
                             </div>
 
                             <div className="alert alert-info">
                                 <strong>Final Shared Secret:</strong> {sharedSecret?.toString() || 'Not calculated yet'}
+
+                                <p className="text-muted small">
+                                    <MathJaxContext>
+
+                                        <MathJax>{"\\begin{align}DH(IK_A, SPK_B) &= "
+                                            + g.toString()
+                                            + "^{" + supplier.identityKey.privateKey.toString()
+                                            + "} \\times "
+                                            + mill.signedPreKey.publicKey.toString()
+                                            + " \\mod "
+                                            + p
+                                            + "\\\\ &= "
+                                            + calculateSharedSecret(supplier.identityKey.privateKey, mill.signedPreKey.publicKey, BigInt(p)).toString()
+                                            + "\\end{align}"}
+                                        </MathJax>
+
+                                        <MathJax>{"\\begin{align}DH(EK_A, IK_B) &= "
+                                            + g.toString()
+                                            + "^{" + supplier.ephemeralKey.privateKey.toString()
+                                            + "} \\times " + mill.identityKey.publicKey.toString()
+                                            + " \\mod "
+                                            + p
+                                            + "\\\\ &= "
+                                            + calculateSharedSecret(supplier.ephemeralKey.privateKey, mill.identityKey.publicKey, BigInt(p)).toString()
+                                            + "\\end{align}"}
+                                        </MathJax>
+
+                                        <MathJax>{"\\begin{align}DH(EK_A,SPK_B) &= "
+                                            + g.toString()
+                                            + "^{" + supplier.ephemeralKey.privateKey.toString()
+                                            + "} \\times " + mill.signedPreKey.publicKey.toString()
+                                            + " \\mod "
+                                            + p
+                                            + "\\\\ &= "
+                                            + calculateSharedSecret(supplier.ephemeralKey.privateKey, mill.signedPreKey.publicKey, BigInt(p)).toString()
+                                            + "\\end{align}"}
+                                        </MathJax>
+
+                                        <MathJax>{"\\begin{align}DH(EK_A, OPK_B) &= "
+                                            + g.toString()
+                                            + "^{" + supplier.ephemeralKey.privateKey.toString()
+                                            + "} \\times "
+                                            + mill.oneTimePreKeys[0].publicKey.toString()
+                                            + " \\mod "
+                                            + p
+                                            + "\\\\ &= "
+                                            + calculateSharedSecret(supplier.ephemeralKey.privateKey, mill.oneTimePreKeys[0].publicKey, BigInt(p)).toString()
+                                            + "\\end{align}"}
+                                        </MathJax>
+
+                                        {/* Supplier Shared Secret */}
+                                        <MathJax>
+                                            {"\\begin{align} ("
+                                                + calculateSharedSecret(supplier.identityKey.privateKey, mill.signedPreKey.publicKey, BigInt(p)).toString()
+                                                + " \\times "
+                                                + calculateSharedSecret(supplier.ephemeralKey.privateKey, mill.identityKey.publicKey, BigInt(p)).toString()
+                                                + "\\times "
+                                                + calculateSharedSecret(supplier.ephemeralKey.privateKey, mill.signedPreKey.publicKey, BigInt(p)).toString()
+                                                + "\\times "
+                                                + calculateSharedSecret(supplier.ephemeralKey.privateKey, mill.oneTimePreKeys[0].publicKey, BigInt(p)).toString()
+                                                + ")\\mod "
+                                                + p.toString()
+                                                + "\\end{align}"}
+                                        </MathJax>
+                                    </MathJaxContext>
+                                </p>
+                            </div>
+                            <div className="mt-3">
+                                <h4>Supplier X3DH Calculation</h4>
+                                <p className="text-muted">
+                                    1. DH(IK_A, SPK_B) <br />
+
+                                    <MathJaxContext>
+                                        <MathJax>{"\\("
+                                            + g.toString()
+                                            + "^{" + supplier.identityKey.privateKey.toString()
+                                            + "} \\times "
+                                            + mill.signedPreKey.publicKey.toString()
+                                            + p
+                                            + " = "
+                                            + calculateSharedSecret(supplier.identityKey.privateKey, mill.signedPreKey.publicKey, BigInt(p)).toString()
+                                            + "\\)"}
+                                        </MathJax>
+                                    </MathJaxContext>
+                                    <br />
+                                    2. DH(EK_A, IK_B) <br />
+                                    <MathJaxContext>
+                                        <MathJax>{"\\(" + g.toString() + "^{" + supplier.ephemeralKey.privateKey.toString() + "} \\times " + mill.identityKey.publicKey.toString() + " \\mod " + p + " = " + calculateSharedSecret(supplier.ephemeralKey.privateKey, mill.identityKey.publicKey, BigInt(p)).toString() + "\\)"}</MathJax>
+                                    </MathJaxContext>
+                                    <br />
+                                    3. DH(EK_A, SPK_B) <br />
+                                    <MathJaxContext>
+                                        <MathJax>{"\\(" + g.toString() + "^{" + supplier.ephemeralKey.privateKey.toString() + "} \\times " + mill.signedPreKey.publicKey.toString() + " \\mod " + p + " = " + calculateSharedSecret(supplier.ephemeralKey.privateKey, mill.signedPreKey.publicKey, BigInt(p)).toString() + "\\)"}</MathJax>
+                                    </MathJaxContext>
+                                    <br />
+                                    4. DH(EK_A, OPK_B) <br />
+                                    <MathJaxContext>
+                                        <MathJax>{"\\(" + g.toString() + "^{" + supplier.ephemeralKey.privateKey.toString() + "} \\times " + mill.oneTimePreKeys[0].publicKey.toString() + " \\mod " + p + " = " + calculateSharedSecret(supplier.ephemeralKey.privateKey, mill.oneTimePreKeys[0].publicKey, BigInt(p)).toString() + "\\)"}</MathJax>
+                                    </MathJaxContext>
+                                    <br /><br />
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -502,18 +604,6 @@ const X3DHDemo: React.FC = () => {
                                 </p>
                             </div>
 
-                            <div className="mt-3">
-                                <h4>Actual X3DH Calculation</h4>
-                                <p className="text-muted">
-                                    1. DH(IK_A, SPK_B) = {g}^{supplier.identityKey.privateKey.toString()} * {mill.signedPreKey.publicKey.toString()} mod {p} = {calculateSharedSecret(supplier.identityKey.privateKey, mill.signedPreKey.publicKey, BigInt(p)).toString()}
-                                    <br />2. DH(EK_A, IK_B) = {g}^{supplier.ephemeralKey.privateKey.toString()} * {mill.identityKey.publicKey.toString()} mod {p} = {calculateSharedSecret(supplier.ephemeralKey.privateKey, mill.identityKey.publicKey, BigInt(p)).toString()}
-                                    <br />3. DH(EK_A, SPK_B) = {g}^{supplier.ephemeralKey.privateKey.toString()} * {mill.signedPreKey.publicKey.toString()} mod {p} = {calculateSharedSecret(supplier.ephemeralKey.privateKey, mill.signedPreKey.publicKey, BigInt(p)).toString()}
-                                    <br />4. DH(EK_A, OPK_B) = {g}^{supplier.ephemeralKey.privateKey.toString()} * {mill.oneTimePreKeys[0].publicKey.toString()} mod {p} = {calculateSharedSecret(supplier.ephemeralKey.privateKey, mill.oneTimePreKeys[0].publicKey, BigInt(p)).toString()}
-                                    <br /><br />
-                                    Final shared secret = ({calculateSharedSecret(supplier.identityKey.privateKey, mill.signedPreKey.publicKey, BigInt(p)).toString()} * {calculateSharedSecret(supplier.ephemeralKey.privateKey, mill.identityKey.publicKey, BigInt(p)).toString()} * {calculateSharedSecret(supplier.ephemeralKey.privateKey, mill.signedPreKey.publicKey, BigInt(p)).toString()} * {calculateSharedSecret(supplier.ephemeralKey.privateKey, mill.oneTimePreKeys[0].publicKey, BigInt(p)).toString()}) mod {p} = {sharedSecret?.toString() || 'Not calculated yet'}
-                                </p>
-                            </div>
-
                             <div>
                                 <h3>X3DH Shared Secret</h3>
                                 <p className="text-muted">
@@ -532,7 +622,6 @@ const X3DHDemo: React.FC = () => {
                                     <br />- ik_b: Mill's identity key public key
                                     <br />- opk_b: Mill's one-time pre-key public key
                                 </p>
-
                             </div>
                         </div>
                     </div>
@@ -566,6 +655,13 @@ const X3DHDemo: React.FC = () => {
                                         readOnly
                                     />
                                 </div>
+                                <div>
+                                    <p className="text-muted small">
+                                        <MathJaxContext>
+                                            <MathJax>{"\\(" + g.toString() + "^{" + mill.identityKey.privateKey.toString() + "} \\mod " + p + " = " + mill.identityKey.publicKey.toString() + "\\)"}</MathJax>
+                                        </MathJaxContext>
+                                    </p>
+                                </div>
                             </div>
 
                             <div className="mb-3">
@@ -592,10 +688,17 @@ const X3DHDemo: React.FC = () => {
                                         readOnly
                                     />
                                 </div>
+                                <div>
+                                    <p className="text-muted small">
+                                        <MathJaxContext>
+                                            <MathJax>{"\\(" + g.toString() + "^{" + mill.signedPreKey.privateKey.toString() + "} \\mod " + p + " = " + mill.signedPreKey.publicKey.toString() + "\\)"}</MathJax>
+                                        </MathJaxContext>
+                                    </p>
+                                </div>
                             </div>
 
                             <div className="mb-3">
-                                <label className="form-label">One-Time Pre-Key (<span className="badge rounded-pill text-bg-danger">OPK_B</span>):</label>
+                                <label className="form-label"><a href="#" onClick={(e) => handleGenerateOneTimePreKey(e)}>One-Time Pre-Key</a> (<span className="badge rounded-pill text-bg-danger">OPK_B</span>):</label>
                                 <div className="input-group mb-2">
                                     <span className="input-group-text">Private</span>
                                     <input
@@ -618,16 +721,111 @@ const X3DHDemo: React.FC = () => {
                                         readOnly
                                     />
                                 </div>
+                                <div>
+                                    <p className="text-muted small">
+                                        <MathJaxContext>
+                                            <MathJax>{"\\(" + g.toString() + "^{" + mill.oneTimePreKeys[0].privateKey.toString() + "} \\mod " + p + " = " + mill.oneTimePreKeys[0].publicKey.toString() + "\\)"}</MathJax>
+                                        </MathJaxContext>
+                                    </p>
+                                </div>
                             </div>
 
                             <div className="alert alert-info">
                                 <strong>Final Shared Secret:</strong> {sharedSecret?.toString() || 'Not calculated yet'}
+                                <p className="text-muted small">
+                                    <MathJaxContext>
+                                        <MathJax>{"\\begin{align}DH(IK_B, SPK_A) &= "
+                                            + g.toString()
+                                            + "^{" + mill.identityKey.privateKey.toString()
+                                            + "} \\times "
+                                            + supplier.signedPreKey.publicKey.toString()
+                                            + " \\mod "
+                                            + p
+                                            + "\\\\ &= "
+                                            + calculateSharedSecret(mill.identityKey.privateKey, supplier.signedPreKey.publicKey, BigInt(p)).toString()
+                                            + "\\end{align}"}
+                                        </MathJax>
+                                        <MathJax>{"\\begin{align}DH(SPK_B, IK_A) &= "
+                                            + g.toString()
+                                            + "^{"
+                                            + mill.signedPreKey.privateKey.toString()
+                                            + "} \\times "
+                                            + supplier.identityKey.publicKey.toString()
+                                            + " \\mod "
+                                            + p
+                                            + "\\\\ &= "
+                                            + calculateSharedSecret(mill.signedPreKey.privateKey, supplier.identityKey.publicKey, BigInt(p)).toString()
+                                            + "\\end{align}"}
+                                        </MathJax>
+                                        <MathJax>{"\\begin{align} DH(SPK_B, EK_A) &= "
+                                            + g.toString()
+                                            + "^{" + mill.signedPreKey.privateKey.toString()
+                                            + "} \\times "
+                                            + supplier.ephemeralKey.publicKey.toString()
+                                            + " \\mod "
+                                            + p
+                                            + "\\\\ &= "
+                                            + calculateSharedSecret(mill.signedPreKey.privateKey, supplier.ephemeralKey.publicKey, BigInt(p)).toString()
+                                            + "\\end{align}"}
+                                        </MathJax>
+                                        <MathJax>{"\\begin{align} DH(OPK_B, EK_A) &= "
+                                            + g.toString()
+                                            + "^{"
+                                            + mill.oneTimePreKeys[0].privateKey.toString()
+                                            + "} \\times "
+                                            + supplier.ephemeralKey.publicKey.toString()
+                                            + " \\mod "
+                                            + p
+                                            + "\\\\ &= "
+                                            + calculateSharedSecret(mill.oneTimePreKeys[0].privateKey, supplier.ephemeralKey.publicKey, BigInt(p)).toString()
+                                            + "\\end{align}"}
+                                        </MathJax>
+                                        <MathJax>
+                                            {"\\begin{align} ("
+                                                + calculateSharedSecret(mill.identityKey.privateKey, supplier.signedPreKey.publicKey, BigInt(p)).toString()
+                                                + " \\times "
+                                                + calculateSharedSecret(mill.signedPreKey.privateKey, supplier.identityKey.publicKey, BigInt(p)).toString()
+                                                + " \\times "
+                                                + calculateSharedSecret(mill.signedPreKey.privateKey, supplier.ephemeralKey.publicKey, BigInt(p)).toString()
+                                                + " \\times "
+                                                + calculateSharedSecret(mill.oneTimePreKeys[0].privateKey, supplier.ephemeralKey.publicKey, BigInt(p)).toString()
+                                                + ")\\mod "
+                                                + p.toString()
+                                                + "\\end{align}"}
+                                        </MathJax>
+                                    </MathJaxContext>
+                                </p>
+                            </div>
+                            <div className="mt-3">
+                                <h4>Mill X3DH Calculation</h4>
+                                <p className="text-muted">
+                                    1. DH(IK_B, SPK_A) <br />
+                                    <MathJaxContext>
+                                        <MathJax>{"\\(" + g.toString() + "^{" + mill.identityKey.privateKey.toString() + "} \\times " + supplier.signedPreKey.publicKey.toString() + " \\mod " + p + " = " + calculateSharedSecret(mill.identityKey.privateKey, supplier.signedPreKey.publicKey, BigInt(p)).toString() + "\\)"}</MathJax>
+                                    </MathJaxContext>
+                                    <br />
+                                    2. DH(SPK_B, IK_A) <br />
+                                    <MathJaxContext>
+                                        <MathJax>{"\\(" + g.toString() + "^{" + mill.signedPreKey.privateKey.toString() + "} \\times " + supplier.identityKey.publicKey.toString() + " \\mod " + p + " = " + calculateSharedSecret(mill.signedPreKey.privateKey, supplier.identityKey.publicKey, BigInt(p)).toString() + "\\)"}</MathJax>
+                                    </MathJaxContext>
+                                    <br />
+                                    3. DH(SPK_B, EK_A) <br />
+                                    <MathJaxContext>
+                                        <MathJax>{"\\(" + g.toString() + "^{" + mill.signedPreKey.privateKey.toString() + "} \\times " + supplier.ephemeralKey.publicKey.toString() + " \\mod " + p + " = " + calculateSharedSecret(mill.signedPreKey.privateKey, supplier.ephemeralKey.publicKey, BigInt(p)).toString() + "\\)"}</MathJax>
+                                    </MathJaxContext>
+                                    <br />
+                                    4. DH(OPK_B, EK_A) <br />
+                                    <MathJaxContext>
+                                        <MathJax>{"\\(" + g.toString() + "^{" + mill.oneTimePreKeys[0].privateKey.toString() + "} \\times " + supplier.ephemeralKey.publicKey.toString() + " \\mod " + p + " = " + calculateSharedSecret(mill.oneTimePreKeys[0].privateKey, supplier.ephemeralKey.publicKey, BigInt(p)).toString() + "\\)"}</MathJax>
+                                    </MathJaxContext>
+                                    <br /><br />
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 
